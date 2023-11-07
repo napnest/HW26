@@ -1,6 +1,5 @@
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -28,10 +27,64 @@ public class Main {
         sets.add(strings3);
         sets.add(strings4);
 
-        //todo Решение дз 1 тут
+        //Найти сумму всех символов в коллекции
+        int sum = sets.stream().flatMap(s->s.stream()).mapToInt(x->x.length()).sum();
 
+        //Найти длину самого большого слова
+        int size = sets.stream().flatMap(s->s.stream()).mapToInt(s->s.length()).max().getAsInt();
+        System.out.println(sum);
+        System.out.println(size);
+        ////////////////////////////////////////////////////////
         //Task2
         List<Employee> employees = EmployeeFactory.createEmployee();
-        //todo решения дз 2 тут
+        //Найти работника с самым большим KPI
+        int maxKPI = employees.stream().mapToInt(s->s.getKpi()).max().getAsInt();
+        Employee employeeMaxKPI = employees.stream().max(Comparator.comparing(Employee::getKpi)).get();
+        System.out.println(maxKPI);
+        System.out.println(employeeMaxKPI);
+        ////////////////////////////////////////////////////////
+        //Найти работника больше 65 лет
+        employees.stream()
+                .filter(x->x.getAge()>65).
+                forEach(e-> System.out.println(e.getName()+" "+e.getSurname()));
+        ////////////////////////////////////////////////////////
+        //Найти работника с самой большой зарплатой
+        int maxSalary = employees.stream().mapToInt(x->x.getSalary()).max().getAsInt();
+        employees.stream().filter(s->s.getSalary()==maxSalary).forEach(System.out::println);
+        Employee employeeMaxSalary = employees.stream().max(Comparator.comparing(Employee::getSalary)).get();
+        System.out.println(maxSalary);
+        System.out.println(employeeMaxSalary);
+        /////////////////////////////////////////////////////////
+        //Найти иностранного работника
+        employees.stream().filter(s->s.getName().matches("[A-z]+")).forEach(System.out::println);
+        /////////////////////////////////////////////////////////
+        //Найти работников с KPI выше среднего
+        double averageKPI = employees.stream().mapToDouble(s->s.getKpi()).average().getAsDouble();
+        System.out.println(averageKPI);
+        employees.stream().filter(s->s.getKpi()>averageKPI).forEach(System.out::println);
+        System.out.println("///////////////////////////////////////////////////");
+        ///////////////////////////////////////////////////////////
+        //Найти среднее KPI работников по условию (возраст<45, зарплата < 20000, не иностранцы)
+        double avgKPI = employees.stream()
+                .filter(s->s.getAge()<45 && s.getName().matches("[А-яЁё]+") && s.getSalary()<20000)
+                .mapToDouble(s->s.getKpi())
+                .average()
+                .getAsDouble();
+        System.out.println(avgKPI);
+        System.out.println("////////////////////////////////////////////////////");
+        //////////////////////////////////////////////////////////////
+        // Используя стримы создайте из списка работников Map<String, Employee>,
+        // где ключом будет Фамилия Имя работника.
+        // В карту должны попасть только те работники,
+        // у которых: возраст до 35 лет, зп больше 10000
+        Map <String, Employee> employeeMap = employees.stream()
+                .filter(e->e.getAge()<35 && e.getSalary()>10000)
+                .collect(Collectors.toMap(e->e.getName()+" "+e.getSurname(),e->e));
+        for(Map.Entry <String,Employee> entry: employeeMap.entrySet()){
+            System.out.println(entry.getKey()+" "+entry.getValue());
+        }
+
+        List <Employee> employeeList = new ArrayList<>();
+
     }
 }
